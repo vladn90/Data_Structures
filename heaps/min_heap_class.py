@@ -1,13 +1,15 @@
 """ Implementing minimum binary heap, a.k.a. priority queue.
 https://en.wikipedia.org/wiki/Priority_queue
 
-All operations take at most lg(n) time, where n is number of nodes:
+All operations take at most O(lg(n)) time, where n is number of nodes:
 1) h = MinHeap()  # initializes an empty binary min heap
 2) h.empty()  # checks if heap is empty
 3) h.insert(x)  # inserts element x into the heap
 4) h.get_min()  # returns current minimum element
 5) h.pop_min()  # removes minimum element and returns it
 6) h.build_heap()  # erases current heap and creates a new one from iterable
+7) h.remove(i)  # removes an element at index i
+8) h.set_value(i, new)  # sets value of element at index i to new
 
 Very good and detailed explanation videos on heaps and priority queues:
 https://www.coursera.org/learn/data-structures week 3
@@ -91,12 +93,36 @@ class MinHeap:
         self.sift_down(1)  # restore min heap order property by sifting down root element
         return removed
 
+    def remove(self, i):
+        """ Removes an element at position i. Time complexity: O(lg(n)).
+        """
+        if i < 1 or i > self.size:
+            raise Exception(f"Element at index {i} doesn't exist.")
+
+        self.heaplist[i] = float("-inf")
+        self.sift_up(i)  # sift removed node up to the root
+        self.pop_max()  # remove it from the heap
+
+    def set_value(self, i, new):
+        """ Changes an element at index i to new while maintaining heap order
+        property. Time complexity: O(lg(n)).
+        """
+        if i < 1 or i > self.size:
+            raise Exception(f"Element at index {i} doesn't exist.")
+
+        if new > self.heaplist[i]:
+            self.heaplist[i] = new
+            self.sift_down(i)
+        else:  # new value < old value
+            self.heaplist[i] = new
+            self.sift_up(i)
+
     def build_heap(self, seq):
         """ Builds min heap from an iterable. Erases current heap.
         Time complexity: O(n).
         """
         self.size = len(seq)
-        self.heaplist = [0] + seq[:]
+        self.heaplist = [0] + seq[:]  # O(n) space
         i = len(seq) // 2
         while i > 0:
             self.sift_down(i)
